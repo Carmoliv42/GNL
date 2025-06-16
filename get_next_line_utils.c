@@ -43,25 +43,25 @@ char	*gnl_strjoin_free(const char *line, const char *buffer)
 	char	*result;
 	int		i;
 	int		j;
-	size_t	len1;
-	size_t	len2;
+	size_t	total;
 
 	i = 0;
 	j = 0;
-	len1 = gnl_strlen(line);
-	len2 = gnl_strlen(buffer);
-	result = malloc(len1 + len2 + 1);
+	if (!line || !buffer)
+		return (NULL);
+	total = gnl_strlen(line) + gnl_strlen(buffer);
+	result = malloc(total + 1);
 	if (!result)
 		return (NULL);
-	while (line && line[i])
+	while (line[i])
 	{
 		result[i] = line[i];
 		i++;
 	}
-	while (buffer && buffer[j])
+	while (buffer[j])
 		result[i++] = buffer[j++];
 	result[i] = '\0';
-	free(line);
+	free((char *) line);
 	return (result);
 }
 
@@ -74,7 +74,7 @@ char	*read_next_line(int fd, char *buffer)
 	if (!temp)
 		return (NULL);
 	bytes = 1;
-	while (!gnl_strchr(buffer, '\n') && bytes > 0)
+	while ((!buffer ||!gnl_strchr(buffer, '\n')) && bytes > 0)
 	{
 		bytes = read(fd, temp, BUFFER_SIZE);
 		if (bytes == -1)
