@@ -51,15 +51,16 @@ char	*get_next_line(int fd)
 	line = extract_line(buffer);
 	buffer = remove_line(buffer);
 	return (line);
-}
-/* 
+} 
+
 int	main(void)
 {
+	//printf("Teste");
 	int	fd = open("test.txt", O_RDONLY);
 	char *line;
 
 	if(fd< 0)
-		reutnr (1);
+		return (1);
 	while ((line = get_next_line(fd)))
 	{
 		printf("%s", line);
@@ -67,4 +68,4 @@ int	main(void)
 	}
 	close(fd);
 	return (0);
-} */
+}

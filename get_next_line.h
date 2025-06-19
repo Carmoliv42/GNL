@@ -17,13 +17,15 @@
 #	define BUFFER_SIZE 42
 # endif
 
-# include <unistd.h>
-# include <stdlib.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <stdio.h>
 
 char	*get_next_line(int fd);
 char	*gnl_strchr(const char *str, int c);
-char	*gnl_strjoin_free(const char *line, const char *buffer);
-char	gnl_strlen(const char *s);
+char	*gnl_strjoin_free(char *line, const char *buffer);
+size_t	gnl_strlen(const char *s);
 char	*read_next_line(int fd, char *buffer);
 char	*extract_line(char *buffer);
 

@@ -12,9 +12,9 @@
 
 #include "get_next_line.h"
 
-char	gnl_strlen(const char *s)
+size_t	gnl_strlen(const char *s)
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
 	while (s[i])
@@ -38,8 +38,9 @@ char	*gnl_strchr(const char *str, int c)
 	return (NULL);
 }
 
-char	*gnl_strjoin_free(const char *line, const char *buffer)
+char	*gnl_strjoin_free(char *line, const char *buffer)
 {
+	
 	char	*result;
 	int		i;
 	int		j;
@@ -74,6 +75,7 @@ char	*read_next_line(int fd, char *buffer)
 	if (!temp)
 		return (NULL);
 	bytes = 1;
+
 	while ((!buffer ||!gnl_strchr(buffer, '\n')) && bytes > 0)
 	{
 		bytes = read(fd, temp, BUFFER_SIZE);
@@ -83,7 +85,8 @@ char	*read_next_line(int fd, char *buffer)
 			free(buffer);
 			return (NULL);
 		}
-		temp[bytes] = '\0';
+		if (bytes > 0)
+			temp[bytes] = '\0';
 		buffer = gnl_strjoin_free(buffer, temp);
 	}
 	free(temp);
