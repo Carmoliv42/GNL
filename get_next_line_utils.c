@@ -6,64 +6,68 @@
 /*   By: carmoliv <carmoliv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 15:43:41 by carmoliv          #+#    #+#             */
-/*   Updated: 2025/06/14 19:53:03 by carmoliv         ###   ########.fr       */
+/*   Updated: 2025/06/21 19:22:56 by carmoliv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	gnl_strlen(const char *s)
+static char	*gnl_strchr(const char *str, int c)
 {
 	size_t	i;
 
+	if (!str)
+		return (NULL);
 	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
-
-char	*gnl_strchr(const char *str, int c)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
+	while (str[i] != (char) c)
 	{
-		if (str[i] == (char) c)
-			return ((char *)&str[i]);
+		if (str[i] == '\0')
+			return (NULL);
 		i++;
 	}
-	if (str[i] == (char) c)
-		return ((char *)&str[i]);
-	return (NULL);
+	return ((char *)&str[i]);
 }
 
 char	*gnl_strjoin_free(char *line, const char *buffer)
 {
-	
 	char	*result;
-	int		i;
-	int		j;
-	size_t	total;
+	size_t	i;
+	size_t	j;
+	size_t	len1;
 
 	i = 0;
 	j = 0;
-	if (!line || !buffer)
+	len1 = 0;
+	if (!buffer && !line)
 		return (NULL);
-	total = gnl_strlen(line) + gnl_strlen(buffer);
-	result = malloc(total + 1);
+	if (line)
+		len1 = gnl_strlen(line);
+	result = malloc(len1 + gnl_strlen(buffer) + 1);
 	if (!result)
 		return (NULL);
-	while (line[i])
+	while (line && line[i])
 	{
 		result[i] = line[i];
 		i++;
 	}
-	while (buffer[j])
+	while (buffer && buffer[j])
 		result[i++] = buffer[j++];
 	result[i] = '\0';
-	free((char *) line);
+	free(line);
 	return (result);
+}
+
+static char	*buffer_start(char *buffer)
+{
+	if (!buffer)
+	{
+		buffer = malloc(1);
+		if (!buffer)
+			return (free(buffer), NULL);
+		else
+			buffer[0] = '\0';
+	}
+	return (buffer);
 }
 
 char	*read_next_line(int fd, char *buffer)
@@ -71,25 +75,30 @@ char	*read_next_line(int fd, char *buffer)
 	char	*temp;
 	ssize_t	bytes;
 
+	buffer = buffer_start(buffer);
 	temp = malloc(BUFFER_SIZE + 1);
 	if (!temp)
+	{
+		free(buffer);
+		free(temp);
 		return (NULL);
+	}
 	bytes = 1;
-
-	while ((!buffer ||!gnl_strchr(buffer, '\n')) && bytes > 0)
+	while (!gnl_strchr(buffer, '\n') && bytes > 0)
 	{
 		bytes = read(fd, temp, BUFFER_SIZE);
 		if (bytes == -1)
-		{
-			free (temp);
-			free(buffer);
-			return (NULL);
-		}
-		if (bytes > 0)
-			temp[bytes] = '\0';
+			break ;
+		temp[bytes] = '\0';
 		buffer = gnl_strjoin_free(buffer, temp);
+		if (!buffer)
+			break ;
 	}
 	free(temp);
+	if (bytes == -1)
+		return (free(buffer), NULL);
+	if (bytes == 0 && (!buffer || buffer[0] == '\0'))
+		return (free(buffer), NULL);
 	return (buffer);
 }
 
@@ -98,15 +107,12 @@ char	*extract_line(char *buffer)
 	size_t	i;
 	char	*line;
 
-	i = 0;
-	if (!buffer || buffer[0] == '\0')
+	if (!buffer || !buffer[0])
 		return (NULL);
+	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
-	if (buffer[i] == '\n')
-		line = malloc(i + 2);
-	else
-		line = malloc(i + 1);
+	line = malloc(i + 2);
 	if (!line)
 		return (NULL);
 	i = 0;
