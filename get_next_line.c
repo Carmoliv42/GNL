@@ -69,9 +69,9 @@ char	*get_next_line(int fd)
 	buffer = new_buffer;
 	return (line);
 }
-int	main(void)
+/*int	main(void)
 {
-	int	fd = open("tes.txt", O_RDONLY);
+	int	fd = open("test.txt", O_RDONLY);
 	char *line;
 	printf("%d", fd);
 	if(fd < 0)
@@ -83,4 +83,4 @@ int	main(void)
 	}
 	close(fd);
 	return (0);
-}
+}*/
