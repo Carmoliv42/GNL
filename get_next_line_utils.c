@@ -6,7 +6,7 @@
 /*   By: carmoliv <carmoliv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 15:43:41 by carmoliv          #+#    #+#             */
-/*   Updated: 2025/06/21 19:22:56 by carmoliv         ###   ########.fr       */
+/*   Updated: 2025/06/24 21:14:23 by carmoliv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ char	*gnl_strjoin_free(char *line, const char *buffer)
 		len1 = gnl_strlen(line);
 	result = malloc(len1 + gnl_strlen(buffer) + 1);
 	if (!result)
-		return (NULL);
+		return (free(line), NULL);
 	while (line && line[i])
 	{
 		result[i] = line[i];
@@ -63,9 +63,8 @@ static char	*buffer_start(char *buffer)
 	{
 		buffer = malloc(1);
 		if (!buffer)
-			return (free(buffer), NULL);
-		else
-			buffer[0] = '\0';
+			return (NULL);
+		buffer[0] = '\0';
 	}
 	return (buffer);
 }
@@ -78,11 +77,7 @@ char	*read_next_line(int fd, char *buffer)
 	buffer = buffer_start(buffer);
 	temp = malloc(BUFFER_SIZE + 1);
 	if (!temp)
-	{
-		free(buffer);
-		free(temp);
 		return (NULL);
-	}
 	bytes = 1;
 	while (!gnl_strchr(buffer, '\n') && bytes > 0)
 	{
@@ -97,12 +92,12 @@ char	*read_next_line(int fd, char *buffer)
 	free(temp);
 	if (bytes == -1)
 		return (free(buffer), NULL);
-	if (bytes == 0 && (!buffer || buffer[0] == '\0'))
+	if (bytes == 0 && buffer[0] == '\0')
 		return (free(buffer), NULL);
 	return (buffer);
 }
 
-char	*extract_line(char *buffer)
+char	*extract_line(const char *buffer)
 {
 	size_t	i;
 	char	*line;

@@ -6,7 +6,7 @@
 /*   By: carmoliv <carmoliv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 15:10:16 by carmoliv          #+#    #+#             */
-/*   Updated: 2025/06/21 19:28:10 by carmoliv         ###   ########.fr       */
+/*   Updated: 2025/06/24 21:03:15 by carmoliv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,18 @@ static char	*remove_line(char *buffer)
 	size_t	j;
 	char	*new_buffer;
 
-	i = 0;
-	j = 0;
 	if (!buffer)
-		return (free(buffer), NULL);
-	while (buffer [i] && buffer[i] != '\n')
+		return (NULL);
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
 		i++;
 	if (!buffer[i])
 		return (free(buffer), NULL);
 	new_buffer = malloc(gnl_strlen(buffer + i + 1) + 1);
 	if (!new_buffer)
-		return (free(new_buffer), NULL);
+		return (free(buffer), NULL);
 	i++;
+	j = 0;
 	while (buffer[i])
 		new_buffer[j++] = buffer[i++];
 	new_buffer[j] = '\0';
@@ -66,14 +66,18 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	new_buffer = remove_line(buffer);
-	buffer = new_buffer;
+	if (!new_buffer)
+		buffer = NULL;
+	else
+		buffer = new_buffer;
 	return (line);
 }
-/*int	main(void)
+/* #include <stdio.h>
+  int	main(void)
 {
-	int	fd = open("test.txt", O_RDONLY);
+	int	fd = open("test2.txt", O_RDONLY);
 	char *line;
-	printf("%d", fd);
+	//printf("%d", fd);
 	if(fd < 0)
 		return (1);
 	while ((line = get_next_line(fd)))
@@ -83,4 +87,4 @@ char	*get_next_line(int fd)
 	}
 	close(fd);
 	return (0);
-}*/
+} */
