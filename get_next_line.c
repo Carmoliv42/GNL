@@ -72,8 +72,8 @@ char	*get_next_line(int fd)
 		buffer = new_buffer;
 	return (line);
 }
-/* #include <stdio.h>
-  int	main(void)
+
+int	main(void)
 {
 	int	fd = open("test2.txt", O_RDONLY);
 	char *line;
@@ -87,4 +87,4 @@ char	*get_next_line(int fd)
 	}
 	close(fd);
 	return (0);
-} */
+}
