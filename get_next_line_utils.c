@@ -6,13 +6,23 @@
 /*   By: carmoliv <carmoliv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 15:43:41 by carmoliv          #+#    #+#             */
-/*   Updated: 2025/06/24 21:14:23 by carmoliv         ###   ########.fr       */
+/*   Updated: 2025/06/26 22:29:29 by carmoliv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	*gnl_strchr(const char *str, int c)
+size_t	gnl_strlen(const char *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (s[i])
+		i++;
+	return (i);
+}
+
+char	*gnl_strchr(const char *str, int c)
 {
 	size_t	i;
 
@@ -57,7 +67,7 @@ char	*gnl_strjoin_free(char *line, const char *buffer)
 	return (result);
 }
 
-static char	*buffer_start(char *buffer)
+char	*buffer_start(char *buffer)
 {
 	if (!buffer)
 	{
@@ -67,57 +77,4 @@ static char	*buffer_start(char *buffer)
 		buffer[0] = '\0';
 	}
 	return (buffer);
-}
-
-char	*read_next_line(int fd, char *buffer)
-{
-	char	*temp;
-	ssize_t	bytes;
-
-	buffer = buffer_start(buffer);
-	temp = malloc(BUFFER_SIZE + 1);
-	if (!temp)
-		return (NULL);
-	bytes = 1;
-	while (!gnl_strchr(buffer, '\n') && bytes > 0)
-	{
-		bytes = read(fd, temp, BUFFER_SIZE);
-		if (bytes == -1)
-			break ;
-		temp[bytes] = '\0';
-		buffer = gnl_strjoin_free(buffer, temp);
-		if (!buffer)
-			break ;
-	}
-	free(temp);
-	if (bytes == -1)
-		return (free(buffer), NULL);
-	if (bytes == 0 && buffer[0] == '\0')
-		return (free(buffer), NULL);
-	return (buffer);
-}
-
-char	*extract_line(const char *buffer)
-{
-	size_t	i;
-	char	*line;
-
-	if (!buffer || !buffer[0])
-		return (NULL);
-	i = 0;
-	while (buffer[i] && buffer[i] != '\n')
-		i++;
-	line = malloc(i + 2);
-	if (!line)
-		return (NULL);
-	i = 0;
-	while (buffer[i] && buffer[i] != '\n')
-	{
-		line[i] = buffer[i];
-		i++;
-	}
-	if (buffer[i] == '\n')
-		line[i++] = '\n';
-	line[i] = '\0';
-	return (line);
 }
