@@ -6,43 +6,41 @@
 /*   By: carmoliv <carmoliv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 15:10:16 by carmoliv          #+#    #+#             */
-/*   Updated: 2025/06/26 22:29:05 by carmoliv         ###   ########.fr       */
+/*   Updated: 2025/06/29 17:32:26 by carmoliv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*read_next_line(int fd, char *buffer)
+static char	*read_next_line(int fd, char *buffer)
 {
 	char	*temp;
 	ssize_t	bytes;
 
-	buffer = buffer_start(buffer);
 	temp = malloc(BUFFER_SIZE + 1);
 	if (!temp)
-		return (NULL);
+		return (free(buffer), NULL);
 	bytes = 1;
 	while (!gnl_strchr(buffer, '\n') && bytes > 0)
 	{
 		bytes = read(fd, temp, BUFFER_SIZE);
 		if (bytes == -1)
-			break ;
+			return (free(temp), free(buffer), NULL);
 		temp[bytes] = '\0';
 		buffer = gnl_strjoin_free(buffer, temp);
 		if (!buffer)
-			break ;
+			return (free(temp), free(buffer), NULL);
 	}
 	free(temp);
-	if (bytes == -1)
-		return (free(buffer), NULL);
-	if (bytes == 0 && buffer[0] == '\0')
+	if (bytes <= 0 && (!buffer || buffer[0] == '\0'))
 		return (free(buffer), NULL);
 	return (buffer);
 }
 
-char	*extract_line(const char *buffer)
+static char	*extract_line(char *buffer)
 {
 	size_t	i;
+	size_t	len;
 	char	*line;
 
 	if (!buffer || !buffer[0])
@@ -50,22 +48,23 @@ char	*extract_line(const char *buffer)
 	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
-	line = malloc(i + 2);
+	len = i;
+	if (buffer[i] == '\n')
+		len++;
+	line = malloc(len + 1);
 	if (!line)
 		return (NULL);
 	i = 0;
-	while (buffer[i] && buffer[i] != '\n')
+	while (i < len)
 	{
 		line[i] = buffer[i];
 		i++;
 	}
-	if (buffer[i] == '\n')
-		line[i++] = '\n';
 	line[i] = '\0';
 	return (line);
 }
 
-char	*remove_line(char *buffer)
+static char	*remove_line(char *buffer)
 {
 	size_t	i;
 	size_t	j;
@@ -78,10 +77,12 @@ char	*remove_line(char *buffer)
 		i++;
 	if (!buffer[i])
 		return (free(buffer), NULL);
-	new_buffer = malloc(gnl_strlen(buffer + i + 1) + 1);
+	i++;
+	if (buffer[i] == '\0')
+		return (free(buffer), NULL);
+	new_buffer = malloc(gnl_strlen(buffer + i) + 1);
 	if (!new_buffer)
 		return (free(buffer), NULL);
-	i++;
 	j = 0;
 	while (buffer[i])
 		new_buffer[j++] = buffer[i++];
@@ -94,7 +95,6 @@ char	*get_next_line(int fd)
 {
 	static char		*buffer;
 	char			*line;
-	char			*new_buffer;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
@@ -108,19 +108,17 @@ char	*get_next_line(int fd)
 		buffer = NULL;
 		return (NULL);
 	}
-	new_buffer = remove_line(buffer);
-	if (!new_buffer)
+	buffer = remove_line(buffer);
+	if (!buffer)
 		buffer = NULL;
-	else
-		buffer = new_buffer;
 	return (line);
 }
 
-/* int	main(void)
+/* #include <stdio.h>
+int	main(void)
 {
-	int	fd = open("test2.txt", O_RDONLY);
+	int	fd = open("1_char.txt", O_RDONLY);
 	char *line;
-	//printf("%d", fd);
 	if(fd < 0)
 		return (1);
 	while ((line = get_next_line(fd)))

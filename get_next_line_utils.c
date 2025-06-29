@@ -6,7 +6,7 @@
 /*   By: carmoliv <carmoliv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 15:43:41 by carmoliv          #+#    #+#             */
-/*   Updated: 2025/06/26 22:29:29 by carmoliv         ###   ########.fr       */
+/*   Updated: 2025/06/29 16:55:49 by carmoliv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ size_t	gnl_strlen(const char *s)
 	size_t	i;
 
 	i = 0;
-	while (s[i])
+	while (s && s[i])
 		i++;
 	return (i);
 }
@@ -38,7 +38,7 @@ char	*gnl_strchr(const char *str, int c)
 	return ((char *)&str[i]);
 }
 
-char	*gnl_strjoin_free(char *line, const char *buffer)
+char	*gnl_strjoin_free(char *line, char *buffer)
 {
 	char	*result;
 	size_t	i;
@@ -48,8 +48,6 @@ char	*gnl_strjoin_free(char *line, const char *buffer)
 	i = 0;
 	j = 0;
 	len1 = 0;
-	if (!buffer && !line)
-		return (NULL);
 	if (line)
 		len1 = gnl_strlen(line);
 	result = malloc(len1 + gnl_strlen(buffer) + 1);
@@ -65,16 +63,4 @@ char	*gnl_strjoin_free(char *line, const char *buffer)
 	result[i] = '\0';
 	free(line);
 	return (result);
-}
-
-char	*buffer_start(char *buffer)
-{
-	if (!buffer)
-	{
-		buffer = malloc(1);
-		if (!buffer)
-			return (NULL);
-		buffer[0] = '\0';
-	}
-	return (buffer);
 }
